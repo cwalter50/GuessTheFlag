@@ -8,6 +8,19 @@
 
 import SwiftUI
 
+struct FlagView: View {
+    var imageName: String
+
+    var body: some View {
+        Image(imageName)
+            .renderingMode(.original)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.black, lineWidth: 1))
+            .shadow(color: .black, radius: 2)
+    }
+}
+
+
 struct ContentView: View {
     
     @State private var countries = ["Estonia", "France", "Germany", "Ireland", "Italy", "Nigeria", "Poland", "Russia", "Spain", "UK", "US"].shuffled()
@@ -18,6 +31,9 @@ struct ContentView: View {
     
     @State var correct = 0
     @State var incorrect = 0
+    
+    // Animation stuff
+    @State private var animationAmount = 0.0
     
     func askQuestion() {
         countries.shuffle()
@@ -44,13 +60,20 @@ struct ContentView: View {
                     Button(action: {
                        // flag was tapped
                         self.flagTapped(number)
+//                        if number == self.correctAnswer
+//                        {
+//
+//                        }
+                        withAnimation {
+                            self.animationAmount += 360
+                        }
+                        
+                        
                     }) {
-                        Image(self.countries[number])
-                            .renderingMode(.original)
-                        .clipShape(RoundedRectangle(cornerRadius: 20))
-                        .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.black, lineWidth: 1))
-                        .shadow(color: .black, radius: 2)
+                        FlagView(imageName: self.countries[number])
+
                     }
+                    .rotation3DEffect(.degrees((number == self.correctAnswer) ? self.animationAmount : 0), axis: (x: 0, y: 1, z: 0))
                 }
                 Text("Score: \(correct) / \(correct + incorrect)")
                     .foregroundColor(.white)
